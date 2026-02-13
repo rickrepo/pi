@@ -419,6 +419,9 @@
         document.addEventListener("drop", e => { e.preventDefault(); });
         document.addEventListener("dragover", e => { e.preventDefault(); });
 
+        // Track whether keydown already handled the input to avoid double-fire
+        let handledByKeydown = false;
+
         // Block key combos for paste / inspect
         document.addEventListener("keydown", e => {
             // Block Ctrl/Cmd+V (paste)
@@ -432,6 +435,7 @@
 
             // Only accept digit keys
             if (e.key >= "0" && e.key <= "9") {
+                handledByKeydown = true;
                 handleDigitInput(e.key);
             }
         });
@@ -439,9 +443,16 @@
         // Hidden input anti-cheat (for mobile)
         hiddenInput.addEventListener("paste", e => { e.preventDefault(); });
         hiddenInput.addEventListener("input", e => {
-            if (!gameState.active) { hiddenInput.value = ""; return; }
             const val = hiddenInput.value;
             hiddenInput.value = "";
+
+            // If keydown already handled this keystroke, skip
+            if (handledByKeydown) {
+                handledByKeydown = false;
+                return;
+            }
+
+            if (!gameState.active) return;
             if (val.length === 1 && val >= "0" && val <= "9") {
                 handleDigitInput(val);
             } else if (val.length > 1) {
