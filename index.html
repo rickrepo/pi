@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pi Digit Challenge</title>
+    <title>Brain Games</title>
     <style>
         * {
             margin: 0;
@@ -27,7 +27,7 @@
             -ms-user-select: none;
         }
 
-        #game-container {
+        #app-container {
             text-align: center;
             max-width: 700px;
             width: 90%;
@@ -49,6 +49,78 @@
             margin-bottom: 2rem;
         }
 
+        /* ---- Main Menu ---- */
+        #main-menu { text-align: center; }
+        #main-menu h1 { font-size: 2.8rem; margin-bottom: 0.5rem; }
+
+        .game-cards {
+            display: flex;
+            gap: 1.5rem;
+            justify-content: center;
+            margin-top: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .game-card {
+            background: rgba(255,255,255,0.03);
+            border: 2px solid #2a2a5e;
+            border-radius: 16px;
+            padding: 2rem 1.5rem;
+            width: 260px;
+            cursor: pointer;
+            transition: all 0.25s;
+        }
+
+        .game-card:hover {
+            border-color: #667eea;
+            background: rgba(102, 126, 234, 0.08);
+            transform: translateY(-4px);
+        }
+
+        .game-card .card-icon {
+            font-size: 4rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .game-card .card-title {
+            font-size: 1.3rem;
+            color: #e0e0ff;
+            margin-bottom: 0.4rem;
+            font-weight: bold;
+        }
+
+        .game-card .card-desc {
+            font-size: 0.8rem;
+            color: #888;
+            line-height: 1.5;
+        }
+
+        .back-btn {
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 0.85rem;
+            padding: 8px 20px;
+            border: 1px solid #444;
+            background: transparent;
+            color: #888;
+            cursor: pointer;
+            border-radius: 6px;
+            transition: all 0.2s;
+            position: absolute;
+            top: 0;
+            left: 0;
+        }
+
+        .back-btn:hover {
+            border-color: #667eea;
+            color: #667eea;
+        }
+
+        .screen { display: none; }
+        .screen.active { display: block; }
+
+        /* ---- Pi Game Styles ---- */
+        #pi-game { position: relative; }
+
         #pi-symbol {
             font-size: 6rem;
             margin: 0.5rem 0;
@@ -58,7 +130,7 @@
             background-clip: text;
         }
 
-        #start-btn {
+        .start-btn {
             font-family: 'Courier New', Courier, monospace;
             font-size: 1.3rem;
             padding: 14px 48px;
@@ -71,14 +143,12 @@
             margin: 1.5rem 0;
         }
 
-        #start-btn:hover {
+        .start-btn:hover {
             background: #667eea;
             color: #0a0a2e;
         }
 
-        #play-area {
-            display: none;
-        }
+        #pi-play-area { display: none; }
 
         #digit-display {
             font-size: 2.8rem;
@@ -90,10 +160,7 @@
             padding: 0 10px;
         }
 
-        #digit-display .correct {
-            color: #4ade80;
-        }
-
+        #digit-display .correct { color: #4ade80; }
         #digit-display .cursor {
             color: #667eea;
             animation: blink 0.7s infinite;
@@ -104,7 +171,7 @@
             50% { opacity: 0.3; }
         }
 
-        #stats-bar {
+        .stats-bar {
             display: flex;
             justify-content: center;
             gap: 2.5rem;
@@ -131,7 +198,7 @@
             color: #667eea;
         }
 
-        #timer-bar {
+        .timer-bar {
             width: 100%;
             height: 4px;
             background: #1a1a4e;
@@ -140,7 +207,7 @@
             overflow: hidden;
         }
 
-        #timer-fill {
+        .timer-fill {
             height: 100%;
             background: linear-gradient(90deg, #4ade80, #667eea);
             border-radius: 2px;
@@ -148,26 +215,22 @@
             transition: width 0.1s linear, background 0.3s;
         }
 
-        #timer-fill.warning {
+        .timer-fill.warning {
             background: linear-gradient(90deg, #f59e0b, #ef4444);
         }
 
-        /* Game Over screen */
-        #game-over {
-            display: none;
-        }
+        /* Game Over shared */
+        .game-over-screen { display: none; }
 
-        #game-over h2 {
+        .game-over-screen h2 {
             font-size: 2rem;
             color: #ef4444;
             margin-bottom: 0.5rem;
         }
 
-        #game-over.perfect h2 {
-            color: #4ade80;
-        }
+        .game-over-screen.perfect h2 { color: #4ade80; }
 
-        #final-score {
+        .final-score {
             font-size: 4rem;
             font-weight: bold;
             background: linear-gradient(135deg, #667eea, #764ba2);
@@ -177,13 +240,13 @@
             margin: 0.5rem 0;
         }
 
-        #final-details {
+        .final-details {
             color: #888;
             margin-bottom: 1rem;
             line-height: 1.8;
         }
 
-        #wrong-digit-info {
+        #wrong-digit-info, #mem-wrong-info {
             background: #1a1a3e;
             border: 1px solid #333;
             border-radius: 8px;
@@ -193,15 +256,10 @@
             font-size: 0.9rem;
         }
 
-        #wrong-digit-info .you-typed {
-            color: #ef4444;
-        }
+        .you-typed { color: #ef4444; }
+        .expected { color: #4ade80; }
 
-        #wrong-digit-info .expected {
-            color: #4ade80;
-        }
-
-        #new-high-score {
+        .new-high-score {
             display: none;
             color: #f59e0b;
             font-size: 1.2rem;
@@ -216,13 +274,13 @@
         }
 
         /* High scores */
-        #high-scores {
+        .high-scores {
             margin-top: 1.5rem;
             border-top: 1px solid #1a1a4e;
             padding-top: 1rem;
         }
 
-        #high-scores h3 {
+        .high-scores h3 {
             color: #667eea;
             margin-bottom: 0.5rem;
             font-size: 0.9rem;
@@ -267,10 +325,8 @@
         #blur-overlay {
             display: none;
             position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
             background: rgba(10, 10, 46, 0.97);
             z-index: 1000;
             align-items: center;
@@ -278,95 +334,261 @@
             flex-direction: column;
         }
 
-        #blur-overlay p {
-            font-size: 1.5rem;
-            color: #ef4444;
-            margin-bottom: 1rem;
-        }
+        #blur-overlay p { font-size: 1.5rem; color: #ef4444; margin-bottom: 1rem; }
+        #blur-overlay .sub { font-size: 0.9rem; color: #888; }
 
-        #blur-overlay .sub {
-            font-size: 0.9rem;
-            color: #888;
-        }
-
-        /* Per-digit timeout indicator */
         #digit-timeout-label {
             font-size: 0.7rem;
             color: #666;
             margin-top: 2px;
         }
 
-        /* Hidden input for mobile keyboard */
-        #hidden-input {
+        /* Hidden inputs */
+        .hidden-input {
             position: absolute;
-            left: -9999px;
-            top: -9999px;
+            left: -9999px; top: -9999px;
             opacity: 0;
-            width: 1px;
-            height: 1px;
+            width: 1px; height: 1px;
+        }
+
+        .try-again-btn {
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 1.1rem;
+            padding: 12px 40px;
+            border: 2px solid #667eea;
+            background: transparent;
+            color: #667eea;
+            cursor: pointer;
+            border-radius: 8px;
+            margin: 1rem 0;
+            transition: all 0.2s;
+        }
+        .try-again-btn:hover {
+            background: #667eea;
+            color: #0a0a2e;
+        }
+
+        /* ---- Memory Game Styles ---- */
+        #mem-game { position: relative; }
+
+        #mem-icon {
+            font-size: 6rem;
+            margin: 0.5rem 0;
+        }
+
+        #mem-word-display {
+            font-size: 3rem;
+            min-height: 80px;
+            margin: 1.5rem 0;
+            letter-spacing: 3px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        #mem-word-display .word-show {
+            color: #e0e0ff;
+            transition: opacity 0.15s;
+        }
+
+        #mem-word-display .word-hidden {
+            color: #667eea;
+            font-size: 1.2rem;
+            letter-spacing: 1px;
+        }
+
+        #mem-type-area {
+            display: none;
+            margin: 1rem auto;
+            max-width: 400px;
+        }
+
+        #mem-type-input {
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 2rem;
+            background: rgba(255,255,255,0.05);
+            border: 2px solid #2a2a5e;
+            border-radius: 8px;
+            color: #e0e0ff;
+            padding: 12px 20px;
+            width: 100%;
+            text-align: center;
+            outline: none;
+            letter-spacing: 3px;
+        }
+
+        #mem-type-input:focus {
+            border-color: #667eea;
+        }
+
+        #mem-type-input::placeholder {
+            color: #444;
+            letter-spacing: 1px;
+            font-size: 1rem;
+        }
+
+        #mem-round-label {
+            font-size: 0.8rem;
+            color: #888;
+            margin-top: 0.5rem;
+        }
+
+        #mem-countdown {
+            font-size: 5rem;
+            color: #667eea;
+            font-weight: bold;
+            min-height: 80px;
+        }
+
+        .level-badge {
+            display: inline-block;
+            font-size: 0.7rem;
+            padding: 3px 10px;
+            border-radius: 99px;
+            margin-bottom: 0.5rem;
+            border: 1px solid #667eea;
+            color: #667eea;
         }
 
         @media (max-width: 600px) {
             h1 { font-size: 1.6rem; }
-            #pi-symbol { font-size: 4rem; }
+            #main-menu h1 { font-size: 2rem; }
+            #pi-symbol, #mem-icon { font-size: 4rem; }
             #digit-display { font-size: 2rem; }
+            #mem-word-display { font-size: 2rem; }
+            #mem-type-input { font-size: 1.5rem; }
             .stat-value { font-size: 1.4rem; }
-            #final-score { font-size: 3rem; }
+            .final-score { font-size: 3rem; }
+            .game-cards { flex-direction: column; align-items: center; }
+            .game-card { width: 90%; }
         }
     </style>
 </head>
 <body>
-    <div id="game-container">
-        <!-- Start Screen -->
-        <div id="start-screen">
-            <h1>Pi Digit Challenge</h1>
-            <p class="subtitle">How many digits of &pi; can you type from memory?</p>
-            <div id="pi-symbol">&pi;</div>
-            <div>
-                <button id="start-btn">Start</button>
+    <div id="app-container">
+
+        <!-- ======== MAIN MENU ======== -->
+        <div id="main-menu" class="screen active">
+            <h1>Brain Games</h1>
+            <p class="subtitle">Pick a challenge</p>
+            <div class="game-cards">
+                <div class="game-card" onclick="showGame('pi')">
+                    <div class="card-icon">&pi;</div>
+                    <div class="card-title">Pi Challenge</div>
+                    <div class="card-desc">Type the digits of &pi; from memory. How far can you get?</div>
+                </div>
+                <div class="game-card" onclick="showGame('mem')">
+                    <div class="card-icon">&#x1F9E0;</div>
+                    <div class="card-title">Word Memory</div>
+                    <div class="card-desc">A word flashes briefly. Type it before time runs out. Words get harder and faster!</div>
+                </div>
             </div>
-            <div id="high-scores-start"></div>
         </div>
 
-        <!-- Play Area -->
-        <div id="play-area">
-            <div id="stats-bar">
-                <div class="stat">
-                    <span class="stat-label">Digits</span>
-                    <span class="stat-value" id="digit-count">0</span>
+        <!-- ======== PI GAME ======== -->
+        <div id="pi-game" class="screen">
+            <button class="back-btn" onclick="showMenu()">&larr; Menu</button>
+
+            <!-- Pi Start -->
+            <div id="pi-start-screen">
+                <h1>Pi Digit Challenge</h1>
+                <p class="subtitle">How many digits of &pi; can you type from memory?</p>
+                <div id="pi-symbol">&pi;</div>
+                <div>
+                    <button class="start-btn" id="pi-start-btn">Start</button>
                 </div>
-                <div class="stat">
-                    <span class="stat-label">Time</span>
-                    <span class="stat-value" id="elapsed-time">0.0s</span>
-                </div>
-                <div class="stat">
-                    <span class="stat-label">Per Digit</span>
-                    <span class="stat-value" id="per-digit-time">-</span>
-                </div>
+                <div id="pi-high-scores-start"></div>
             </div>
-            <div id="timer-bar"><div id="timer-fill"></div></div>
-            <div id="digit-timeout-label">Type the next digit within 15 seconds</div>
-            <div id="digit-display">
-                <span class="correct">3.</span><span class="cursor">_</span>
+
+            <!-- Pi Play Area -->
+            <div id="pi-play-area">
+                <div class="stats-bar">
+                    <div class="stat">
+                        <span class="stat-label">Digits</span>
+                        <span class="stat-value" id="digit-count">0</span>
+                    </div>
+                    <div class="stat">
+                        <span class="stat-label">Time</span>
+                        <span class="stat-value" id="elapsed-time">0.0s</span>
+                    </div>
+                    <div class="stat">
+                        <span class="stat-label">Per Digit</span>
+                        <span class="stat-value" id="per-digit-time">-</span>
+                    </div>
+                </div>
+                <div class="timer-bar"><div class="timer-fill" id="pi-timer-fill"></div></div>
+                <div id="digit-timeout-label">Type the next digit within 15 seconds</div>
+                <div id="digit-display">
+                    <span class="correct">3.</span><span class="cursor">_</span>
+                </div>
+                <input class="hidden-input" id="pi-hidden-input" type="text" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
             </div>
-            <input id="hidden-input" type="text" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
+
+            <!-- Pi Game Over -->
+            <div id="pi-game-over" class="game-over-screen">
+                <h2>Game Over</h2>
+                <div class="final-score" id="pi-final-score">0</div>
+                <div>digits after the decimal</div>
+                <div class="new-high-score" id="pi-new-high-score">NEW HIGH SCORE!</div>
+                <div class="final-details" id="pi-final-details"></div>
+                <div id="wrong-digit-info"></div>
+                <button class="try-again-btn" id="pi-restart-btn">Try Again</button>
+                <div id="pi-high-scores-end"></div>
+            </div>
         </div>
 
-        <!-- Game Over -->
-        <div id="game-over">
-            <h2>Game Over</h2>
-            <div id="final-score">0</div>
-            <div>digits after the decimal</div>
-            <div id="new-high-score">NEW HIGH SCORE!</div>
-            <div id="final-details"></div>
-            <div id="wrong-digit-info"></div>
-            <button id="start-btn-2" style="font-family: 'Courier New', Courier, monospace;
-                font-size: 1.1rem; padding: 12px 40px; border: 2px solid #667eea;
-                background: transparent; color: #667eea; cursor: pointer;
-                border-radius: 8px; margin: 1rem 0; transition: all 0.2s;">
-                Try Again
-            </button>
-            <div id="high-scores-end"></div>
+        <!-- ======== MEMORY GAME ======== -->
+        <div id="mem-game" class="screen">
+            <button class="back-btn" onclick="showMenu()">&larr; Menu</button>
+
+            <!-- Memory Start -->
+            <div id="mem-start-screen">
+                <h1>Word Memory</h1>
+                <p class="subtitle">See a word, type it from memory before time runs out</p>
+                <div id="mem-icon">&#x1F9E0;</div>
+                <div>
+                    <button class="start-btn" id="mem-start-btn">Start</button>
+                </div>
+                <div id="mem-high-scores-start"></div>
+            </div>
+
+            <!-- Memory Play Area -->
+            <div id="mem-play-area" style="display:none;">
+                <div class="stats-bar">
+                    <div class="stat">
+                        <span class="stat-label">Score</span>
+                        <span class="stat-value" id="mem-score">0</span>
+                    </div>
+                    <div class="stat">
+                        <span class="stat-label">Round</span>
+                        <span class="stat-value" id="mem-round">1</span>
+                    </div>
+                    <div class="stat">
+                        <span class="stat-label">Streak</span>
+                        <span class="stat-value" id="mem-streak">0</span>
+                    </div>
+                </div>
+                <div class="timer-bar"><div class="timer-fill" id="mem-timer-fill"></div></div>
+                <div id="mem-round-label">Memorize the word!</div>
+                <div id="mem-word-display">
+                    <span class="word-show" id="mem-word-text"></span>
+                </div>
+                <div id="mem-type-area">
+                    <input id="mem-type-input" type="text" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" placeholder="type the word...">
+                </div>
+            </div>
+
+            <!-- Memory Game Over -->
+            <div id="mem-game-over" class="game-over-screen">
+                <h2>Game Over</h2>
+                <div class="final-score" id="mem-final-score">0</div>
+                <div>words remembered</div>
+                <div class="new-high-score" id="mem-new-high-score">NEW HIGH SCORE!</div>
+                <div class="final-details" id="mem-final-details"></div>
+                <div id="mem-wrong-info"></div>
+                <button class="try-again-btn" id="mem-restart-btn">Try Again</button>
+                <div id="mem-high-scores-end"></div>
+            </div>
         </div>
     </div>
 
@@ -377,308 +599,532 @@
     </div>
 
     <script>
-        // Pi digits (1000 digits after decimal point)
-        const PI_DIGITS = "1415926535897932384626433832795028841971693993751058209749445923078164062862089986280348253421170679821480865132823066470938446095505822317253594081284811174502841027019385211055596446229489549303819644288109756659334461284756482337867831652712019091456485669234603486104543266482133936072602491412737245870066063155881748815209209628292540917153643678925903600113305305488204665213841469519415116094330572703657595919530921861173819326117931051185480744623799627495673518857527248912279381830119491298336733624406566430860213949463952247371907021798609437027705392171762931767523846748184676694051320005681271452635608277857713427577896091736371787214684409012249534301465495853710507922796892589235420199561121290219608640344181598136297747713099605187072113499999983729780499510597317328160963185950244594553469083026425223082533446850352619311881710100031378387528865875332083814206171776691473035982534904287554687311595628638823537875937519577818577805321712268066130019278766111959092164201989";
+    // ============================================================
+    //  NAVIGATION
+    // ============================================================
+    let currentGame = null;  // 'pi' | 'mem' | null
 
-        const PER_DIGIT_TIMEOUT = 15000; // 15 seconds per digit
+    function showMenu() {
+        // Stop any running game
+        if (currentGame === 'pi' && piState.active) piEndGame(true);
+        if (currentGame === 'mem' && memState.active) memEndGame();
+        currentGame = null;
+        document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+        document.getElementById('main-menu').classList.add('active');
+    }
 
-        let gameState = {
-            active: false,
+    function showGame(id) {
+        currentGame = id;
+        document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+        document.getElementById(id === 'pi' ? 'pi-game' : 'mem-game').classList.add('active');
+        // Show start screen within the game
+        if (id === 'pi') {
+            document.getElementById('pi-start-screen').style.display = 'block';
+            document.getElementById('pi-play-area').style.display = 'none';
+            document.getElementById('pi-game-over').style.display = 'none';
+            piRenderHighScores(document.getElementById('pi-high-scores-start'));
+        } else {
+            document.getElementById('mem-start-screen').style.display = 'block';
+            document.getElementById('mem-play-area').style.display = 'none';
+            document.getElementById('mem-game-over').style.display = 'none';
+            memRenderHighScores(document.getElementById('mem-high-scores-start'));
+        }
+    }
+
+    // ============================================================
+    //  SHARED: Anti-cheat
+    // ============================================================
+    document.addEventListener("paste", e => e.preventDefault());
+    document.addEventListener("contextmenu", e => e.preventDefault());
+    document.addEventListener("drop", e => e.preventDefault());
+    document.addEventListener("dragover", e => e.preventDefault());
+
+    const blurOverlay = document.getElementById("blur-overlay");
+
+    document.addEventListener("visibilitychange", () => {
+        if (document.hidden) {
+            if (currentGame === 'pi' && piState.active) {
+                piState.tabSwitched = true;
+                piEndGame(true);
+                blurOverlay.style.display = "flex";
+                setTimeout(() => blurOverlay.style.display = "none", 3000);
+            }
+            if (currentGame === 'mem' && memState.active) {
+                memEndGame();
+                blurOverlay.style.display = "flex";
+                setTimeout(() => blurOverlay.style.display = "none", 3000);
+            }
+        }
+    });
+
+    window.addEventListener("blur", () => {
+        if (currentGame === 'pi' && piState.active) {
+            piState.tabSwitched = true;
+            piEndGame(true);
+            blurOverlay.style.display = "flex";
+            setTimeout(() => blurOverlay.style.display = "none", 3000);
+        }
+        if (currentGame === 'mem' && memState.active) {
+            memEndGame();
+            blurOverlay.style.display = "flex";
+            setTimeout(() => blurOverlay.style.display = "none", 3000);
+        }
+    });
+
+    // ============================================================
+    //  PI CHALLENGE GAME
+    // ============================================================
+    const PI_DIGITS = "1415926535897932384626433832795028841971693993751058209749445923078164062862089986280348253421170679821480865132823066470938446095505822317253594081284811174502841027019385211055596446229489549303819644288109756659334461284756482337867831652712019091456485669234603486104543266482133936072602491412737245870066063155881748815209209628292540917153643678925903600113305305488204665213841469519415116094330572703657595919530921861173819326117931051185480744623799627495673518857527248912279381830119491298336733624406566430860213949463952247371907021798609437027705392171762931767523846748184676694051320005681271452635608277857713427577896091736371787214684409012249534301465495853710507922796892589235420199561121290219608640344181598136297747713099605187072113499999983729780499510597317328160963185950244594553469083026425223082533446850352619311881710100031378387528865875332083814206171776691473035982534904287554687311595628638823537875937519577818577805321712268066130019278766111959092164201989";
+
+    const PI_PER_DIGIT_TIMEOUT = 15000;
+
+    let piState = {
+        active: false,
+        digitsTyped: 0,
+        startTime: null,
+        lastDigitTime: null,
+        digitTimer: null,
+        elapsed: 0,
+        timerInterval: null,
+        tabSwitched: false,
+    };
+
+    const piHiddenInput = document.getElementById("pi-hidden-input");
+    let piHandledByKeydown = false;
+
+    document.addEventListener("keydown", e => {
+        if ((e.ctrlKey || e.metaKey) && e.key === "v") { e.preventDefault(); return; }
+        if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key === "V") { e.preventDefault(); return; }
+        if ((e.ctrlKey || e.metaKey) && e.key === "a") { e.preventDefault(); return; }
+
+        if (currentGame !== 'pi' || !piState.active) return;
+
+        if (e.key >= "0" && e.key <= "9") {
+            piHandledByKeydown = true;
+            piHandleDigitInput(e.key);
+        }
+    });
+
+    piHiddenInput.addEventListener("paste", e => e.preventDefault());
+    piHiddenInput.addEventListener("input", () => {
+        const val = piHiddenInput.value;
+        piHiddenInput.value = "";
+        if (piHandledByKeydown) { piHandledByKeydown = false; return; }
+        if (!piState.active) return;
+        if (val.length === 1 && val >= "0" && val <= "9") {
+            piHandleDigitInput(val);
+        } else if (val.length > 1) {
+            piEndGame(true);
+        }
+    });
+
+    function piStartGame() {
+        piState = {
+            active: true,
             digitsTyped: 0,
-            startTime: null,
-            lastDigitTime: null,
+            startTime: Date.now(),
+            lastDigitTime: Date.now(),
             digitTimer: null,
             elapsed: 0,
             timerInterval: null,
             tabSwitched: false,
         };
+        document.getElementById("pi-start-screen").style.display = "none";
+        document.getElementById("pi-game-over").style.display = "none";
+        document.getElementById("pi-play-area").style.display = "block";
 
-        // DOM elements
-        const startScreen = document.getElementById("start-screen");
-        const playArea = document.getElementById("play-area");
-        const gameOverScreen = document.getElementById("game-over");
-        const digitDisplay = document.getElementById("digit-display");
-        const digitCount = document.getElementById("digit-count");
-        const elapsedTime = document.getElementById("elapsed-time");
-        const perDigitTime = document.getElementById("per-digit-time");
-        const timerFill = document.getElementById("timer-fill");
-        const blurOverlay = document.getElementById("blur-overlay");
-        const startBtn = document.getElementById("start-btn");
-        const startBtn2 = document.getElementById("start-btn-2");
-        const hiddenInput = document.getElementById("hidden-input");
+        document.getElementById("digit-count").textContent = "0";
+        document.getElementById("elapsed-time").textContent = "0.0s";
+        document.getElementById("per-digit-time").textContent = "-";
+        const fill = document.getElementById("pi-timer-fill");
+        fill.style.width = "100%";
+        fill.classList.remove("warning");
 
-        // ---- Anti-cheat measures ----
+        piUpdateDisplay();
+        piStartElapsedTimer();
+        piResetDigitTimer();
+        piHiddenInput.focus();
+    }
 
-        // Block paste everywhere
-        document.addEventListener("paste", e => { e.preventDefault(); });
+    function piHandleDigitInput(digit) {
+        if (!piState.active) return;
+        const expected = PI_DIGITS[piState.digitsTyped];
+        if (digit === expected) {
+            piState.digitsTyped++;
+            piState.lastDigitTime = Date.now();
+            document.getElementById("digit-count").textContent = piState.digitsTyped;
+            const avg = ((Date.now() - piState.startTime) / 1000 / piState.digitsTyped).toFixed(1);
+            document.getElementById("per-digit-time").textContent = avg + "s";
+            piUpdateDisplay();
+            piResetDigitTimer();
+            if (piState.digitsTyped >= PI_DIGITS.length) piEndGame(false, true);
+        } else {
+            piEndGame(false, false, digit, expected);
+        }
+    }
 
-        // Block context menu
-        document.addEventListener("contextmenu", e => { e.preventDefault(); });
+    function piUpdateDisplay() {
+        const typed = PI_DIGITS.substring(0, piState.digitsTyped);
+        document.getElementById("digit-display").innerHTML =
+            '<span class="correct">3.' + typed + '</span><span class="cursor">_</span>';
+    }
 
-        // Block drag and drop
-        document.addEventListener("drop", e => { e.preventDefault(); });
-        document.addEventListener("dragover", e => { e.preventDefault(); });
+    function piStartElapsedTimer() {
+        piState.timerInterval = setInterval(() => {
+            if (!piState.active) return;
+            piState.elapsed = (Date.now() - piState.startTime) / 1000;
+            document.getElementById("elapsed-time").textContent = piState.elapsed.toFixed(1) + "s";
+        }, 100);
+    }
 
-        // Track whether keydown already handled the input to avoid double-fire
-        let handledByKeydown = false;
+    function piResetDigitTimer() {
+        if (piState.digitTimer) clearInterval(piState.digitTimer);
+        const digitStart = Date.now();
+        const fill = document.getElementById("pi-timer-fill");
+        fill.style.width = "100%";
+        fill.classList.remove("warning");
 
-        // Block key combos for paste / inspect
-        document.addEventListener("keydown", e => {
-            // Block Ctrl/Cmd+V (paste)
-            if ((e.ctrlKey || e.metaKey) && e.key === "v") { e.preventDefault(); return; }
-            // Block Ctrl/Cmd+Shift+V
-            if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key === "V") { e.preventDefault(); return; }
-            // Block Ctrl/Cmd+A (select all)
-            if ((e.ctrlKey || e.metaKey) && e.key === "a") { e.preventDefault(); return; }
+        piState.digitTimer = setInterval(() => {
+            if (!piState.active) return;
+            const remaining = PI_PER_DIGIT_TIMEOUT - (Date.now() - digitStart);
+            const pct = Math.max(0, (remaining / PI_PER_DIGIT_TIMEOUT) * 100);
+            fill.style.width = pct + "%";
+            if (pct < 33) fill.classList.add("warning");
+            else fill.classList.remove("warning");
+            if (remaining <= 0) piEndGame(false, false, "timeout");
+        }, 50);
+    }
 
-            if (!gameState.active) return;
+    function piEndGame(tabSwitch = false, allComplete = false, wrongDigit = null, expectedDigit = null) {
+        piState.active = false;
+        clearInterval(piState.timerInterval);
+        clearInterval(piState.digitTimer);
 
-            // Only accept digit keys
-            if (e.key >= "0" && e.key <= "9") {
-                handledByKeydown = true;
-                handleDigitInput(e.key);
-            }
+        const totalTime = ((Date.now() - piState.startTime) / 1000).toFixed(1);
+        const digits = piState.digitsTyped;
+
+        document.getElementById("pi-play-area").style.display = "none";
+        const goScreen = document.getElementById("pi-game-over");
+        goScreen.style.display = "block";
+
+        const title = goScreen.querySelector("h2");
+        document.getElementById("pi-final-score").textContent = digits;
+        const details = document.getElementById("pi-final-details");
+        const wrongInfo = document.getElementById("wrong-digit-info");
+        const newHigh = document.getElementById("pi-new-high-score");
+
+        if (allComplete) {
+            title.textContent = "Incredible!";
+            goScreen.classList.add("perfect");
+            details.innerHTML = `You typed all ${PI_DIGITS.length} digits in ${totalTime}s!`;
+            wrongInfo.innerHTML = "";
+        } else if (tabSwitch) {
+            title.textContent = "Cheater?";
+            goScreen.classList.remove("perfect");
+            details.innerHTML = `You left the page after ${digits} digit${digits !== 1 ? "s" : ""} (${totalTime}s).<br>Stay focused!`;
+            wrongInfo.innerHTML = "";
+        } else if (wrongDigit === "timeout") {
+            title.textContent = "Too Slow!";
+            goScreen.classList.remove("perfect");
+            details.innerHTML = `Timed out after ${digits} digit${digits !== 1 ? "s" : ""} (${totalTime}s).<br>You have ${PI_PER_DIGIT_TIMEOUT / 1000}s per digit.`;
+            wrongInfo.innerHTML = `Next expected digit: <span class="expected">${PI_DIGITS[digits]}</span>`;
+        } else {
+            title.textContent = "Wrong!";
+            goScreen.classList.remove("perfect");
+            const avgTime = digits > 0 ? (totalTime / digits).toFixed(1) : "-";
+            details.innerHTML = `${digits} digit${digits !== 1 ? "s" : ""} in ${totalTime}s (avg ${avgTime}s/digit)`;
+            wrongInfo.innerHTML = `You typed <span class="you-typed">${wrongDigit}</span> — expected <span class="expected">${expectedDigit}</span> at position ${digits + 1}`;
+        }
+
+        const isNew = piSaveScore(digits, parseFloat(totalTime));
+        newHigh.style.display = isNew ? "block" : "none";
+        piRenderHighScores(document.getElementById("pi-high-scores-end"));
+    }
+
+    function piGetScores() {
+        try { return JSON.parse(localStorage.getItem("pi-highscores") || "[]"); }
+        catch { return []; }
+    }
+
+    function piSaveScore(digits, time) {
+        const scores = piGetScores();
+        scores.push({ digits, time, date: new Date().toLocaleDateString() });
+        scores.sort((a, b) => b.digits - a.digits || a.time - b.time);
+        const top = scores.slice(0, 10);
+        localStorage.setItem("pi-highscores", JSON.stringify(top));
+        return top[0].digits === digits && top[0].time === time;
+    }
+
+    function piRenderHighScores(container) {
+        const scores = piGetScores();
+        if (!scores.length) { container.innerHTML = ""; return; }
+        let html = '<div class="high-scores"><h3>High Scores</h3>';
+        scores.forEach((s, i) => {
+            html += `<div class="score-entry"><span class="rank">#${i+1}</span><span class="score-digits">${s.digits} digit${s.digits!==1?"s":""}</span><span class="score-time">${s.time}s</span></div>`;
         });
+        container.innerHTML = html + "</div>";
+    }
 
-        // Hidden input anti-cheat (for mobile)
-        hiddenInput.addEventListener("paste", e => { e.preventDefault(); });
-        hiddenInput.addEventListener("input", e => {
-            const val = hiddenInput.value;
-            hiddenInput.value = "";
+    document.getElementById("pi-start-btn").addEventListener("click", piStartGame);
+    document.getElementById("pi-restart-btn").addEventListener("click", piStartGame);
+    document.addEventListener("click", () => { if (currentGame === 'pi' && piState.active) piHiddenInput.focus(); });
 
-            // If keydown already handled this keystroke, skip
-            if (handledByKeydown) {
-                handledByKeydown = false;
-                return;
+    // ============================================================
+    //  WORD MEMORY GAME
+    // ============================================================
+
+    const WORD_POOLS = [
+        // Tier 0 — short & easy (rounds 1-3)
+        ["cat","dog","sun","red","hat","box","cup","pen","map","run","big","top","hot","net","fog","jam","lip","mud","oak","zip"],
+        // Tier 1 — common words (rounds 4-6)
+        ["apple","house","drink","flame","stone","brave","cloud","shelf","plant","crane","ghost","badge","crisp","frost","globe","grain","prize","quest","spoon","trail"],
+        // Tier 2 — longer / trickier (rounds 7-10)
+        ["blanket","feather","kitchen","special","trouble","forward","village","captain","shelter","diamond","airport","bicycle","catalog","dolphin","express","fantasy","harvest","journey","library","mustard"],
+        // Tier 3 — tricky spelling (rounds 11-15)
+        ["necessary","occurrence","committee","guarantee","privilege","technique","definitely","desperate","recommend","threshold","brilliant","challenge","elaborate","frequency","influence","knowledge","negotiate","petroleum","recognize","structure"],
+        // Tier 4 — hard (rounds 16-20)
+        ["accommodate","bureaucracy","entrepreneur","exaggerate","maintenance","mischievous","perseverance","questionnaire","surveillance","temperature","anniversary","accidentally","bibliography","catastrophe","environment","fluorescent","hemorrhage","independent","kaleidoscope","marshmallow"],
+        // Tier 5 — very hard (rounds 21+)
+        ["onomatopoeia","consciousness","archaeological","chrysanthemum","miscellaneous","pneumonia","acquaintance","bourgeoisie","connoisseur","idiosyncrasy","millionaire","occasionally","pharmaceutical","reconnaissance","rendezvous","subconscious","thoroughfare","unprecedented","vulnerability","xylophone"]
+    ];
+
+    // How long (ms) the word is shown — decreases with rounds
+    function memShowTime(round) {
+        // Starts at 2.5s, drops to a floor of 0.8s
+        return Math.max(800, 2500 - (round - 1) * 150);
+    }
+
+    // How long (ms) the player has to type — decreases with rounds
+    function memTypeTime(round) {
+        // Starts at 12s, drops to floor of 5s
+        return Math.max(5000, 12000 - (round - 1) * 500);
+    }
+
+    function memPickWord(round) {
+        let tier;
+        if (round <= 3) tier = 0;
+        else if (round <= 6) tier = 1;
+        else if (round <= 10) tier = 2;
+        else if (round <= 15) tier = 3;
+        else if (round <= 20) tier = 4;
+        else tier = 5;
+        const pool = WORD_POOLS[tier];
+        return pool[Math.floor(Math.random() * pool.length)];
+    }
+
+    let memState = {
+        active: false,
+        round: 0,
+        score: 0,
+        currentWord: "",
+        phase: "idle",  // "showing" | "typing" | "idle"
+        showTimer: null,
+        typeTimer: null,
+        typeTimerInterval: null,
+    };
+
+    const memTypeInput = document.getElementById("mem-type-input");
+
+    function memStartGame() {
+        memState = {
+            active: true,
+            round: 0,
+            score: 0,
+            currentWord: "",
+            phase: "idle",
+            showTimer: null,
+            typeTimer: null,
+            typeTimerInterval: null,
+        };
+        document.getElementById("mem-start-screen").style.display = "none";
+        document.getElementById("mem-game-over").style.display = "none";
+        document.getElementById("mem-play-area").style.display = "block";
+        document.getElementById("mem-score").textContent = "0";
+        document.getElementById("mem-round").textContent = "1";
+        document.getElementById("mem-streak").textContent = "0";
+        memNextRound();
+    }
+
+    function memNextRound() {
+        memState.round++;
+        memState.phase = "showing";
+        memState.currentWord = memPickWord(memState.round);
+
+        document.getElementById("mem-round").textContent = memState.round;
+
+        const wordText = document.getElementById("mem-word-text");
+        const typeArea = document.getElementById("mem-type-area");
+        const roundLabel = document.getElementById("mem-round-label");
+        const fill = document.getElementById("mem-timer-fill");
+
+        // Reset
+        typeArea.style.display = "none";
+        memTypeInput.value = "";
+        fill.style.width = "100%";
+        fill.classList.remove("warning");
+
+        // Show the word
+        const showMs = memShowTime(memState.round);
+        roundLabel.textContent = `Memorize! (${(showMs/1000).toFixed(1)}s)`;
+        wordText.textContent = memState.currentWord;
+        wordText.style.opacity = "1";
+
+        // Animate timer bar for show phase
+        const showStart = Date.now();
+        if (memState.showTimer) clearInterval(memState.showTimer);
+        memState.showTimer = setInterval(() => {
+            const elapsed = Date.now() - showStart;
+            const pct = Math.max(0, (1 - elapsed / showMs) * 100);
+            fill.style.width = pct + "%";
+            if (elapsed >= showMs) {
+                clearInterval(memState.showTimer);
+                memStartTypingPhase();
             }
+        }, 30);
+    }
 
-            if (!gameState.active) return;
-            if (val.length === 1 && val >= "0" && val <= "9") {
-                handleDigitInput(val);
-            } else if (val.length > 1) {
-                // Multi-char input = paste attempt or autocomplete; end game
-                endGame(true);
+    function memStartTypingPhase() {
+        memState.phase = "typing";
+
+        const wordText = document.getElementById("mem-word-text");
+        const typeArea = document.getElementById("mem-type-area");
+        const roundLabel = document.getElementById("mem-round-label");
+        const fill = document.getElementById("mem-timer-fill");
+
+        // Hide word
+        wordText.textContent = "???";
+        wordText.style.opacity = "0.3";
+
+        // Show input
+        typeArea.style.display = "block";
+        memTypeInput.value = "";
+        memTypeInput.focus();
+
+        const typeMs = memTypeTime(memState.round);
+        roundLabel.textContent = `Type it! (${(typeMs/1000).toFixed(0)}s)`;
+        fill.style.width = "100%";
+        fill.classList.remove("warning");
+
+        const typeStart = Date.now();
+        if (memState.typeTimerInterval) clearInterval(memState.typeTimerInterval);
+        memState.typeTimerInterval = setInterval(() => {
+            if (!memState.active) return;
+            const elapsed = Date.now() - typeStart;
+            const pct = Math.max(0, (1 - elapsed / typeMs) * 100);
+            fill.style.width = pct + "%";
+            if (pct < 33) fill.classList.add("warning");
+            else fill.classList.remove("warning");
+            if (elapsed >= typeMs) {
+                clearInterval(memState.typeTimerInterval);
+                memEndGame("timeout");
             }
+        }, 30);
+    }
+
+    // Submit on Enter
+    memTypeInput.addEventListener("keydown", e => {
+        if (e.key === "Enter" && memState.active && memState.phase === "typing") {
+            e.preventDefault();
+            memCheckAnswer();
+        }
+    });
+
+    // Block paste in memory input
+    memTypeInput.addEventListener("paste", e => e.preventDefault());
+
+    function memCheckAnswer() {
+        if (!memState.active || memState.phase !== "typing") return;
+        clearInterval(memState.typeTimerInterval);
+
+        const answer = memTypeInput.value.trim().toLowerCase();
+        const expected = memState.currentWord.toLowerCase();
+
+        if (answer === expected) {
+            memState.score++;
+            document.getElementById("mem-score").textContent = memState.score;
+            document.getElementById("mem-streak").textContent = memState.score;
+            // Brief success flash then next round
+            const wordText = document.getElementById("mem-word-text");
+            wordText.textContent = memState.currentWord;
+            wordText.style.opacity = "1";
+            wordText.style.color = "#4ade80";
+            document.getElementById("mem-type-area").style.display = "none";
+            document.getElementById("mem-round-label").textContent = "Correct!";
+            setTimeout(() => {
+                wordText.style.color = "";
+                if (memState.active) memNextRound();
+            }, 600);
+        } else {
+            memEndGame("wrong", answer);
+        }
+    }
+
+    function memEndGame(reason, userAnswer) {
+        memState.active = false;
+        memState.phase = "idle";
+        clearInterval(memState.showTimer);
+        clearInterval(memState.typeTimerInterval);
+
+        document.getElementById("mem-play-area").style.display = "none";
+        const goScreen = document.getElementById("mem-game-over");
+        goScreen.style.display = "block";
+
+        const title = goScreen.querySelector("h2");
+        const finalScore = document.getElementById("mem-final-score");
+        const details = document.getElementById("mem-final-details");
+        const wrongInfo = document.getElementById("mem-wrong-info");
+        const newHigh = document.getElementById("mem-new-high-score");
+
+        finalScore.textContent = memState.score;
+
+        if (reason === "timeout") {
+            title.textContent = "Too Slow!";
+            details.innerHTML = `You ran out of time on round ${memState.round}.`;
+            wrongInfo.innerHTML = `The word was: <span class="expected">${memState.currentWord}</span>`;
+        } else if (reason === "wrong") {
+            title.textContent = "Wrong!";
+            details.innerHTML = `Misspelled on round ${memState.round}.`;
+            wrongInfo.innerHTML = `You typed <span class="you-typed">${userAnswer || "(nothing)"}</span> — correct was <span class="expected">${memState.currentWord}</span>`;
+        } else {
+            // tab switch / generic
+            title.textContent = "Game Over";
+            details.innerHTML = `You made it to round ${memState.round}.`;
+            wrongInfo.innerHTML = "";
+        }
+
+        const isNew = memSaveScore(memState.score);
+        newHigh.style.display = isNew ? "block" : "none";
+        memRenderHighScores(document.getElementById("mem-high-scores-end"));
+    }
+
+    // ---- Memory High Scores ----
+    function memGetScores() {
+        try { return JSON.parse(localStorage.getItem("mem-highscores") || "[]"); }
+        catch { return []; }
+    }
+
+    function memSaveScore(score) {
+        const scores = memGetScores();
+        scores.push({ score, date: new Date().toLocaleDateString() });
+        scores.sort((a, b) => b.score - a.score);
+        const top = scores.slice(0, 10);
+        localStorage.setItem("mem-highscores", JSON.stringify(top));
+        return top[0].score === score;
+    }
+
+    function memRenderHighScores(container) {
+        const scores = memGetScores();
+        if (!scores.length) { container.innerHTML = ""; return; }
+        let html = '<div class="high-scores"><h3>High Scores</h3>';
+        scores.forEach((s, i) => {
+            html += `<div class="score-entry"><span class="rank">#${i+1}</span><span class="score-digits">${s.score} word${s.score!==1?"s":""}</span><span class="score-time">${s.date}</span></div>`;
         });
+        container.innerHTML = html + "</div>";
+    }
 
-        // Tab / window focus detection
-        document.addEventListener("visibilitychange", () => {
-            if (gameState.active && document.hidden) {
-                gameState.tabSwitched = true;
-                endGame(true);
-                blurOverlay.style.display = "flex";
-                setTimeout(() => { blurOverlay.style.display = "none"; }, 3000);
-            }
-        });
+    document.getElementById("mem-start-btn").addEventListener("click", memStartGame);
+    document.getElementById("mem-restart-btn").addEventListener("click", memStartGame);
 
-        window.addEventListener("blur", () => {
-            if (gameState.active) {
-                gameState.tabSwitched = true;
-                endGame(true);
-                blurOverlay.style.display = "flex";
-                setTimeout(() => { blurOverlay.style.display = "none"; }, 3000);
-            }
-        });
-
-        // ---- Game logic ----
-
-        function startGame() {
-            gameState = {
-                active: true,
-                digitsTyped: 0,
-                startTime: Date.now(),
-                lastDigitTime: Date.now(),
-                digitTimer: null,
-                elapsed: 0,
-                timerInterval: null,
-                tabSwitched: false,
-            };
-
-            startScreen.style.display = "none";
-            gameOverScreen.style.display = "none";
-            playArea.style.display = "block";
-
-            digitCount.textContent = "0";
-            elapsedTime.textContent = "0.0s";
-            perDigitTime.textContent = "-";
-            timerFill.style.width = "100%";
-            timerFill.classList.remove("warning");
-
-            updateDisplay();
-            startElapsedTimer();
-            resetDigitTimer();
-
-            // Focus hidden input for mobile
-            hiddenInput.focus();
-        }
-
-        function handleDigitInput(digit) {
-            if (!gameState.active) return;
-
-            const expected = PI_DIGITS[gameState.digitsTyped];
-
-            if (digit === expected) {
-                gameState.digitsTyped++;
-                gameState.lastDigitTime = Date.now();
-                digitCount.textContent = gameState.digitsTyped;
-
-                const avg = ((Date.now() - gameState.startTime) / 1000 / gameState.digitsTyped).toFixed(1);
-                perDigitTime.textContent = avg + "s";
-
-                updateDisplay();
-                resetDigitTimer();
-
-                if (gameState.digitsTyped >= PI_DIGITS.length) {
-                    endGame(false, true); // completed all digits!
-                }
-            } else {
-                endGame(false, false, digit, expected);
-            }
-        }
-
-        function updateDisplay() {
-            const typed = PI_DIGITS.substring(0, gameState.digitsTyped);
-            // Show "3." prefix + typed digits + cursor
-            let html = '<span class="correct">3.' + typed + '</span>';
-            html += '<span class="cursor">_</span>';
-            digitDisplay.innerHTML = html;
-        }
-
-        function startElapsedTimer() {
-            gameState.timerInterval = setInterval(() => {
-                if (!gameState.active) return;
-                gameState.elapsed = (Date.now() - gameState.startTime) / 1000;
-                elapsedTime.textContent = gameState.elapsed.toFixed(1) + "s";
-            }, 100);
-        }
-
-        function resetDigitTimer() {
-            if (gameState.digitTimer) clearInterval(gameState.digitTimer);
-
-            const digitStart = Date.now();
-            timerFill.style.width = "100%";
-            timerFill.classList.remove("warning");
-
-            gameState.digitTimer = setInterval(() => {
-                if (!gameState.active) return;
-                const remaining = PER_DIGIT_TIMEOUT - (Date.now() - digitStart);
-                const pct = Math.max(0, (remaining / PER_DIGIT_TIMEOUT) * 100);
-                timerFill.style.width = pct + "%";
-
-                if (pct < 33) {
-                    timerFill.classList.add("warning");
-                } else {
-                    timerFill.classList.remove("warning");
-                }
-
-                if (remaining <= 0) {
-                    endGame(false, false, "timeout");
-                }
-            }, 50);
-        }
-
-        function endGame(tabSwitch = false, allComplete = false, wrongDigit = null, expectedDigit = null) {
-            gameState.active = false;
-            clearInterval(gameState.timerInterval);
-            clearInterval(gameState.digitTimer);
-
-            const totalTime = ((Date.now() - gameState.startTime) / 1000).toFixed(1);
-            const digits = gameState.digitsTyped;
-
-            playArea.style.display = "none";
-            gameOverScreen.style.display = "block";
-
-            const gameOverTitle = gameOverScreen.querySelector("h2");
-            const finalScore = document.getElementById("final-score");
-            const finalDetails = document.getElementById("final-details");
-            const wrongInfo = document.getElementById("wrong-digit-info");
-            const newHighScore = document.getElementById("new-high-score");
-
-            finalScore.textContent = digits;
-
-            if (allComplete) {
-                gameOverTitle.textContent = "Incredible!";
-                gameOverScreen.classList.add("perfect");
-                finalDetails.innerHTML = `You typed all ${PI_DIGITS.length} digits in ${totalTime}s!`;
-                wrongInfo.innerHTML = "";
-            } else if (tabSwitch) {
-                gameOverTitle.textContent = "Cheater?";
-                gameOverScreen.classList.remove("perfect");
-                finalDetails.innerHTML = `You left the page after ${digits} digit${digits !== 1 ? "s" : ""} (${totalTime}s).<br>Stay focused!`;
-                wrongInfo.innerHTML = "";
-            } else if (wrongDigit === "timeout") {
-                gameOverTitle.textContent = "Too Slow!";
-                gameOverScreen.classList.remove("perfect");
-                finalDetails.innerHTML = `Timed out after ${digits} digit${digits !== 1 ? "s" : ""} (${totalTime}s).<br>You have ${PER_DIGIT_TIMEOUT / 1000}s per digit.`;
-                wrongInfo.innerHTML = `Next expected digit: <span class="expected">${PI_DIGITS[digits]}</span>`;
-            } else {
-                gameOverTitle.textContent = "Wrong!";
-                gameOverScreen.classList.remove("perfect");
-                const avgTime = digits > 0 ? (totalTime / digits).toFixed(1) : "-";
-                finalDetails.innerHTML = `${digits} digit${digits !== 1 ? "s" : ""} in ${totalTime}s (avg ${avgTime}s/digit)`;
-                wrongInfo.innerHTML = `You typed <span class="you-typed">${wrongDigit}</span> — expected <span class="expected">${expectedDigit}</span> at position ${digits + 1}`;
-            }
-
-            // Check high score
-            const isNew = saveScore(digits, parseFloat(totalTime));
-            newHighScore.style.display = isNew ? "block" : "none";
-
-            renderHighScores(document.getElementById("high-scores-end"));
-        }
-
-        // ---- High Scores (localStorage) ----
-
-        function getScores() {
-            try {
-                return JSON.parse(localStorage.getItem("pi-highscores") || "[]");
-            } catch {
-                return [];
-            }
-        }
-
-        function saveScore(digits, time) {
-            const scores = getScores();
-            const entry = { digits, time, date: new Date().toLocaleDateString() };
-            scores.push(entry);
-            // Sort: most digits first, then fastest time
-            scores.sort((a, b) => b.digits - a.digits || a.time - b.time);
-            // Keep top 10
-            const top = scores.slice(0, 10);
-            localStorage.setItem("pi-highscores", JSON.stringify(top));
-            // Is this the new #1?
-            return top[0].digits === digits && top[0].time === time;
-        }
-
-        function renderHighScores(container) {
-            const scores = getScores();
-            if (scores.length === 0) {
-                container.innerHTML = "";
-                return;
-            }
-            let html = '<div id="high-scores"><h3>High Scores</h3>';
-            scores.forEach((s, i) => {
-                html += `<div class="score-entry">
-                    <span class="rank">#${i + 1}</span>
-                    <span class="score-digits">${s.digits} digit${s.digits !== 1 ? "s" : ""}</span>
-                    <span class="score-time">${s.time}s</span>
-                </div>`;
-            });
-            html += "</div>";
-            container.innerHTML = html;
-        }
-
-        // ---- Init ----
-
-        startBtn.addEventListener("click", startGame);
-        startBtn2.addEventListener("click", startGame);
-
-        // Render initial high scores on start screen
-        renderHighScores(document.getElementById("high-scores-start"));
-
-        // Keep focus on hidden input for mobile
-        document.addEventListener("click", () => {
-            if (gameState.active) hiddenInput.focus();
-        });
     </script>
 </body>
 </html>
